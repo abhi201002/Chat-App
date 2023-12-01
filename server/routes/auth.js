@@ -15,7 +15,7 @@ router.post("/register", register);
 router.get("/allusers/:id", getAllUsers);
 router.post("/setavatar/:id", setAvatar);
 router.get("/logout/:id", logOut);
-router.get("/search/:username", search)
+router.get("/search/:username/:cur_user", search)
 router.get("/friends", findFriends)
 
 module.exports = router;

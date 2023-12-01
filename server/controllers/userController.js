@@ -86,9 +86,10 @@ module.exports.logOut = (req, res, next) => {
 
 module.exports.search = async(req, res, next) => {
   const user_name = req.params.username;
+  const cur_user = req.params.cur_user;
 
   try{
-    const result = await User.find({username : {$regex: user_name}});
+    const result = await User.find({username : {$regex: user_name, $ne: cur_user}});
 
     res.status(200).json(result);
   }
