@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import styled from "styled-components";
-import { searchRoute } from '../utils/APIRoutes';
+import styled, { css } from "styled-components";
+import { friendRequest, searchRoute } from '../utils/APIRoutes';
 import axios from 'axios';
 import { useDataLayer } from '../datalayer';
 
@@ -8,13 +8,21 @@ function Search() {
     const [state, dispatch] = useDataLayer();
     const [search, setSearch] = useState("");
     const [result, setResult] = useState([]);
+    const sendRequest = async(user) =>{
+        try {
+            const result = await axios.post(`${friendRequest}/requestfriends/${state._id}/${user}`);
+            handleSearch()
+        } catch (error) {
+            alert("Error!");
+        }
+    }
 
-    useEffect(async () => {
+    const handleSearch = async () => {
         if(search === ""){
             setResult([]);
         }
         else{
-            const search_url = `${searchRoute}/${search}/${state.username}`
+            const search_url = `${searchRoute}/${search}/${state._id}`
             
             const data = await axios.get(search_url)
             
@@ -22,7 +30,9 @@ function Search() {
             
             setResult(data.data)
         }
-    }, [search])
+    }
+
+    useEffect(handleSearch, [search])
     return (
         <SearchBox>
             <div className="search-bar">
@@ -35,8 +45,20 @@ function Search() {
                     result.map((item) => {
                         return(
                             <Item>
-                                <img src="https://i.seadn.io/gae/2hDpuTi-0AMKvoZJGd-yKWvK4tKdQr_kLIpB_qSeMau2TNGCNidAosMEvrEXFO9G6tmlFlPQplpwiqirgrIPWnCKMvElaYgI-HiVvXc?auto=format&dpr=1&w=1000" alt="" />
-                                <h3 className="username">{item.username}</h3>
+                                <div className="item-info">
+                                    <img src="https://i.seadn.io/gae/2hDpuTi-0AMKvoZJGd-yKWvK4tKdQr_kLIpB_qSeMau2TNGCNidAosMEvrEXFO9G6tmlFlPQplpwiqirgrIPWnCKMvElaYgI-HiVvXc?auto=format&dpr=1&w=1000" alt="" />
+                                    <h3 className="username">{item.username}</h3>
+                                </div>
+                                <div className='add-friend'>
+                                    <button onClick={() => {sendRequest(item._id)}} className= {`${item.request.includes(state._id.toString()) ? "add-friend-success" : "add-friend-send"}`}>
+                                        {
+                                            item.request.includes(state._id.toString()) === true?
+                                            ("Added !")
+                                            :
+                                            "Add Friend"
+                                        }
+                                    </button>
+                                </div>
                             </Item>
                         )
                     })
@@ -46,6 +68,16 @@ function Search() {
                     :
                         <div className="message"> No Result Found! </div>
                 }
+            </div>
+            <div className="alert">
+                <div className="alert-info" bg = {bg}>
+                    Friend Request Send Successfully
+                </div>
+                <div className="alert-bar">
+                    <div className="alert-timer">
+
+                    </div>
+                </div>
             </div>
         </SearchBox>
     )
@@ -79,20 +111,38 @@ const SearchBox = styled.div`
     .search-bar input:focus{
         outline: none;
     }
+    .alert{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: fixed;
+        right: 30px;
+        bottom: 50px;
+    }
+    .alert-info{
+        padding: 20px 20px;
+        background-color: rgba(19,19,36,255);
+        color: white;
+    }
+    .alert-bar{
+        height: 10px;
+        width: 100%;
+        background-color: blue;
+    }
 `
 
 const Item = styled.button`
     /* align-items: center; */
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
     background-color: transparent;
     border: none;
     color: white;
     width: 100%;
     height: 60px;
-    padding: 0px 15px;
+    padding: 0px 5px;
     margin: 10px 0px;
     background-color: rgba(255, 255, 255, 0.204);
     div{
@@ -102,6 +152,37 @@ const Item = styled.button`
         height: 3rem;
         border-radius: 50%;
         margin-right: 10px;
+    }
+    button{
+        padding: 4px 3px;
+        cursor: pointer;
+        /* background-color: blue; */
+        border: none;
+        border-radius: 2px;
+        font-weight: 500;
+    }
+    .add-friend-success{
+        background-color: green;
+    }
+    .add-friend-send{
+        background-color: blue;
+    }
+    .item-info{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .add-friend{
+        display: none;
+    }
+    /* .add-friend-send :hover{
+        background-color: #0000e1;
+        transition: background-color 100ms;
+    } */
+    :hover{
+        .add-friend{
+            display: block;
+        }
     }
 `
 export default Search

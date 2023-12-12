@@ -5,8 +5,7 @@ const {
   setAvatar,
   logOut,
   search,
-  findFriends
-} = require("../controllers/userController");
+} = require("../controllers/userController.js");
 
 const router = require("express").Router();
 
@@ -16,6 +15,6 @@ router.get("/allusers/:id", getAllUsers);
 router.post("/setavatar/:id", setAvatar);
 router.get("/logout/:id", logOut);
 router.get("/search/:username/:cur_user", search)
-router.get("/friends", findFriends)
+
 
 module.exports = router;

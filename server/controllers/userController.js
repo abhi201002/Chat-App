@@ -89,23 +89,13 @@ module.exports.search = async(req, res, next) => {
   const cur_user = req.params.cur_user;
 
   try{
-    const result = await User.find({username : {$regex: user_name, $ne: cur_user}});
+    let result = await User.find({username : {$regex: user_name}, _id: {$ne: cur_user}});
+
+    result = result.filter(item => item.friends.includes(cur_user) === false) 
 
     res.status(200).json(result);
   }
   catch(err){
     next(err);
-  }
-}
-
-module.exports.findFriends = async(req, res, next) => {
-  const friends = req.body.friends;
-
-  try {
-    const result = await User.find({_id: {$in: friends}});
-
-    res.status(200).json(result);
-  } catch (error) {
-    next(error)
   }
 }

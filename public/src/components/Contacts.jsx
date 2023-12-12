@@ -3,12 +3,14 @@ import styled from "styled-components";
 import Logo from "../assets/logo.svg";
 import { useDataLayer } from "../datalayer";
 import Search from "./Search";
+import Notifcation from "./Notifcation";
 
 export default function Contacts({ contacts, changeChat }) {
   const [currentUserName, setCurrentUserName] = useState(undefined);
   const [currentUserImage, setCurrentUserImage] = useState(undefined);
   const [currentSelected, setCurrentSelected] = useState(undefined);
   const [search, setSearch] = useState(false)
+  const [notification, setNotification] = useState(false)
   const [data, dispatch] = useDataLayer();
   useEffect(async () => {
     // const data = await JSON.parse(
@@ -21,6 +23,39 @@ export default function Contacts({ contacts, changeChat }) {
     setCurrentSelected(index);
     changeChat(contact);
   };
+  const changenotify = () => {
+    setNotification(!notification);
+  }
+  const handleSearch = (cond1) => {
+    if(!cond1){
+      return (<div className="contacts">
+                {contacts.map((contact, index) => {
+                    return (
+                    <div
+                        key={contact._id}
+                        className={`contact ${
+                        index === currentSelected ? "selected" : ""
+                        }`}
+                        onClick={() => changeCurrentChat(index, contact)}
+                        >
+                        <div className="avatar">
+                        <img
+                            src={`data:image/svg+xml;base64,${contact.avatarImage}`}
+                            alt=""
+                        />
+                        </div>
+                        <div className="username">
+                        <h3>{contact.username}</h3>
+                        </div>
+                    </div>
+                    );
+                })}
+            </div>)
+    }
+    else{
+        return (<Search/>)
+    }
+  }
   return (
     <>
       {currentUserName && currentUserImage && (
@@ -29,46 +64,29 @@ export default function Contacts({ contacts, changeChat }) {
             <img src={Logo} alt="logo" />
             <h3>Chatty</h3>
           </div>
-          <div className="friends">
-            <button className={`toggle ${!search? "active":""}`} onClick={() => {setSearch(false)}}>Friends</button>
-            <button className={`toggle ${search? "active":""}`} onClick={() => {setSearch(true)}}>Search</button>
-          </div>
-          <div className="side">
-
-          {
-            !search?
-            (<div className="contacts">
-              {contacts.map((contact, index) => {
-                return (
-                  <div
-                    key={contact._id}
-                    className={`contact ${
-                      index === currentSelected ? "selected" : ""
-                    }`}
-                    onClick={() => changeCurrentChat(index, contact)}
-                    >
-                    <div className="avatar">
-                      <img
-                        src={`data:image/svg+xml;base64,${contact.avatarImage}`}
-                        alt=""
-                      />
-                    </div>
-                    <div className="username">
-                      <h3>{contact.username}</h3>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>)
-            :
-            <Search/>
-          }
+          <div className="notify">
+            {!notification?
+              (<>
+                <div className="friends">
+                  <button className={`toggle ${!search? "active":""}`} onClick={() => {setSearch(false)}}>Friends</button>
+                  <button className={`toggle ${search? "active":""}`} onClick={() => {setSearch(true)}}>Search</button>
+                </div>
+                <div className="side">
+                {
+                  handleSearch(search)
+                }
+                </div>
+              </>)
+              :
+              <Notifcation changenotify = {changenotify}/>
+            }
           </div>
           <div className="current-user">
             <div className="avatar">
               <img
                 src={`data:image/svg+xml;base64,${currentUserImage}`}
                 alt="avatar"
+                onClick={() => {changenotify()}}
               />
             </div>
             <div className="username">
@@ -102,6 +120,9 @@ const Container = styled.div`
       text-transform: uppercase;
     }
   }
+  .notify{
+    height: 100%;
+  }
   .friends{
     display: flex;
     justify-content: center;
@@ -120,7 +141,9 @@ const Container = styled.div`
     background-color: #ffffff;
   }
   .side{
-    flex: 70%;
+    /* flex: 70%; */
+    height: 100%;
+    /* border: 2px solid purple; */
   }
   .contacts {
     height: 100%;

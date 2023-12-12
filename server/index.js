@@ -1,8 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const authRoutes = require("./routes/auth");
-const messageRoutes = require("./routes/messages");
+const authRoutes = require("./routes/auth.js");
+const messageRoutes = require("./routes/messages.js");
+const friendRoutes = require("./routes/friends.js");
 const app = express();
 const socket = require("socket.io");
 require("dotenv").config();
@@ -24,6 +25,7 @@ const connect = async() =>{
 } 
 
 app.use("/api/auth", authRoutes);
+app.use("/api/friends", friendRoutes);
 app.use("/api/messages", messageRoutes);
 
 const server = app.listen(process.env.PORT, () =>{
