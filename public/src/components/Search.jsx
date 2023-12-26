@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled, { css } from "styled-components";
 import { friendRequest, searchRoute } from '../utils/APIRoutes';
 import axios from 'axios';
@@ -8,10 +8,24 @@ function Search() {
     const [state, dispatch] = useDataLayer();
     const [search, setSearch] = useState("");
     const [result, setResult] = useState([]);
+    const [bar, setBar] = useState({per: 100, status: false});
+    const box = {
+        right: bar.status ? "30px" : "-1000000px",
+        transition :"right 10ms"
+    }
+    const timer = {
+        backgroundColor:"blue",
+        width: `${bar.per}%`,
+        transition: "width 5000ms",
+    }
     const sendRequest = async(user) =>{
         try {
             const result = await axios.post(`${friendRequest}/requestfriends/${state._id}/${user}`);
-            handleSearch()
+            handleSearch();
+            setBar({per: 0, status: true});
+            setTimeout(() => {
+                setBar({per: 100, status: false});
+            },5000)
         } catch (error) {
             alert("Error!");
         }
@@ -46,7 +60,11 @@ function Search() {
                         return(
                             <Item>
                                 <div className="item-info">
-                                    <img src="https://i.seadn.io/gae/2hDpuTi-0AMKvoZJGd-yKWvK4tKdQr_kLIpB_qSeMau2TNGCNidAosMEvrEXFO9G6tmlFlPQplpwiqirgrIPWnCKMvElaYgI-HiVvXc?auto=format&dpr=1&w=1000" alt="" />
+                                    {/* <img src="https://i.seadn.io/gae/2hDpuTi-0AMKvoZJGd-yKWvK4tKdQr_kLIpB_qSeMau2TNGCNidAosMEvrEXFO9G6tmlFlPQplpwiqirgrIPWnCKMvElaYgI-HiVvXc?auto=format&dpr=1&w=1000" alt="" /> */}
+                                    <img
+                                        src={`data:image/svg+xml;base64,${item.avatarImage}`}
+                                        alt=""
+                                    />
                                     <h3 className="username">{item.username}</h3>
                                 </div>
                                 <div className='add-friend'>
@@ -69,16 +87,16 @@ function Search() {
                         <div className="message"> No Result Found! </div>
                 }
             </div>
-            <div className="alert">
-                <div className="alert-info" bg = {bg}>
-                    Friend Request Send Successfully
-                </div>
-                <div className="alert-bar">
-                    <div className="alert-timer">
+                <div className="alert" style={box}>
+                    <div className="alert-info">
+                        Friend Request Send Successfully
+                    </div>
+                    <div className="alert-bar">
+                        <div className="alert-timer" style={timer}>
 
+                        </div>
                     </div>
                 </div>
-            </div>
         </SearchBox>
     )
 }
@@ -127,7 +145,11 @@ const SearchBox = styled.div`
     .alert-bar{
         height: 10px;
         width: 100%;
-        background-color: blue;
+        background-color: white;
+    }
+    .alert-timer{
+        width: 100%;
+        height: 100%;
     }
 `
 

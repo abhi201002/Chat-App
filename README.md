@@ -1,0 +1,1 @@
+Chat application was successfully deployed and can be accessed using https://chatty-app-k276.onrender.com/
